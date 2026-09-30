@@ -7,12 +7,13 @@ Usage:
 
 The background is removed with rembg, local contrast is improved with
 OpenCV CLAHE, the subject is composited on white, and the result is
-converted to grayscale as <source-stem>-prepped.png.
+saved as source-prepped.png unless --output is supplied.
 """
 
 from __future__ import annotations
 
 import argparse
+import io
 import sys
 from pathlib import Path
 
@@ -28,46 +29,48 @@ except ImportError as exc:
         "`pip install -r scripts/requirements.txt`."
     ) from exc
 
+DEFAULT_OUTPUT = Path("source-prepped.png")
 
-def output_path_for(source: Path) -> Path:
-    return source.with_name(f"{source.stem}-prepped.png")
+
+def load_cutout(source: Image.Image) -> Image.Image:
+    """Run rembg and normalize either supported output form to an RGBA image."""
+    result = remove(source)
+    if isinstance(result, Image.Image):
+        return result.convert("RGBA")
+    if isinstance(result, bytes):
+        return Image.open(io.BytesIO(result)).convert("RGBA")
+    raise TypeError(f"Background removal returned an unsupported value: {type(result)!r}")
 
 
 def prepare(source: Path, output: Path) -> None:
-    if not source.exists():
+    if not source.is_file():
         raise FileNotFoundError(f"Source image does not exist: {source}")
 
     try:
-        with Image.open(source) as img:
-            rgba = img.convert("RGBA")
+        with Image.open(source) as image:
+            rgba = image.convert("RGBA")
     except Exception as exc:
         raise ValueError(f"Could not open image '{source}': {exc}") from exc
 
     try:
-        cutout = remove(rgba)
-        if not isinstance(cutout, Image.Image):
-            cutout = Image.open(cutout)
-        cutout = cutout.convert("RGBA")
+        cutout = load_cutout(rgba)
     except Exception as exc:
         raise RuntimeError(f"Background removal failed: {exc}") from exc
 
-    # Composite on pure white so transparent pixels become bright background.
+    # Composite on pure white so transparent pixels become a sparse ASCII background.
     white = Image.new("RGBA", cutout.size, (255, 255, 255, 255))
     composited = Image.alpha_composite(white, cutout).convert("RGB")
 
-    # OpenCV CLAHE improves local facial/edge contrast without globally
-    # crushing highlights and shadows.
+    # CLAHE improves local facial/edge contrast without crushing highlights.
     bgr = cv2.cvtColor(np.asarray(composited), cv2.COLOR_RGB2BGR)
     lab = cv2.cvtColor(bgr, cv2.COLOR_BGR2LAB)
-    l_channel, a_channel, b_channel = cv2.split(lab)
-    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-    l_channel = clahe.apply(l_channel)
+    lightness, a_channel, b_channel = cv2.split(lab)
+    lightness = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8)).apply(lightness)
     enhanced = cv2.cvtColor(
-        cv2.merge((l_channel, a_channel, b_channel)), cv2.COLOR_LAB2BGR
+        cv2.merge((lightness, a_channel, b_channel)), cv2.COLOR_LAB2BGR
     )
-    gray = cv2.cvtColor(enhanced, cv2.COLOR_BGR2GRAY)
-
-    Image.fromarray(gray).save(output)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    Image.fromarray(cv2.cvtColor(enhanced, cv2.COLOR_BGR2GRAY)).save(output)
     print(f"Saved prepared portrait: {output}")
 
 
@@ -75,14 +78,13 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Prepare a portrait for ASCII art.")
     parser.add_argument("source", type=Path, help="Source photo (JPG/PNG/WebP/etc.)")
     parser.add_argument(
-        "-o", "--output", type=Path, default=None,
-        help="Output PNG path. Defaults to <source-stem>-prepped.png."
+        "-o", "--output", type=Path, default=DEFAULT_OUTPUT,
+        help="Output PNG path (default: source-prepped.png)."
     )
     args = parser.parse_args()
 
-    output = args.output or output_path_for(args.source)
     try:
-        prepare(args.source, output)
+        prepare(args.source, args.output)
     except Exception as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1
