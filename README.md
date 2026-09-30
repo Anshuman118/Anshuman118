@@ -11,7 +11,7 @@
 <table>
   <tr>
     <td valign="top">
-      <img src="https://raw.githubusercontent.com/Anshuman118/Anshuman118/a709385462e1d9d01f127559a652fa13308f2d8b/avi-ascii.svg" width="370" alt="Animated ASCII portrait" />
+      <img src="https://raw.githubusercontent.com/Anshuman118/Anshuman118/e149f81da37d2d063abf9db9b9a62c612e881e70/avi-ascii.svg" width="370" alt="Animated ASCII portrait" />
     </td>
     <td valign="top">
       <img src="./info-card.svg" width="490" alt="Animated neofetch profile card" />
