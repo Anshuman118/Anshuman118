@@ -1,0 +1,14 @@
+{
+  "username": "YOUR_GITHUB_USERNAME",
+  "generated_at": null,
+  "days": [],
+  "total_contributions": 0,
+  "current_streak": 0,
+  "longest_streak": 0,
+  "best_day": {
+    "date": null,
+    "count": 0,
+    "level": 0
+  },
+  "monthly_totals": {}
+}
