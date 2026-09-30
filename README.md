@@ -24,7 +24,7 @@
 ### <code>Anshuman118@github ~ $ cat stack.txt</code>
 
 <pre>
-Python • C++ • Java • JavaScript • Git • GitHub
+Python • C++ • JavaScript • Git • GitHub
 </pre>
 
 ### <code>Anshuman118@github ~ $ exit</code>
@@ -35,37 +35,19 @@ Python • C++ • Java • JavaScript • Git • GitHub
 
 ## Customize
 
-This profile is intentionally built from local, self-contained SVGs rather than third-party
-GitHub-stat widgets. The repository follows the requested terminal/neofetch architecture:
-the README embeds generated SVGs with `<img>`, while SVG SMIL animations handle the visual
-effects.
+The profile uses self-contained SVGs: the README only embeds them, while all animation lives inside the SVG files. No JavaScript, external CSS, third-party statistics widget, personal access token, or GitHub GraphQL API is required.
 
-### Configuration
+### Profile settings
 
-Replace these placeholders before pushing:
-
-- `Anshuman118` — your GitHub username.
-- `YOUR_NAME` — your display name.
-- `YOUR_ROLE` — your role.
-- `CURRENT_FOCUS` — what you are working on now.
-- `PREVIOUS_EXPERIENCE` — previous experience.
-- `YOUR_HIGHLIGHTS` / the `HIGHLIGHTS` value — projects, achievements, etc.
-- `PORTRAIT SOURCE` — your local source image.
-- Colors — edit the constants at the top of the SVG generator scripts.
-- SVG widths — edit the README `<img width="...">` values.
-- Animation speed — change the `begin`/`dur` values in the SVG generator scripts.
-
-### Where to edit
-
-| What you want to change | Edit |
+| Change | Edit |
 |---|---|
-| Username | `README.md`, `.github/workflows/update-profile-art.yml`, and `--username` when fetching |
-| Name / role / focus / experience / stack | `scripts/make_info_card.py` |
-| Portrait | Supply a new source photo to `scripts/prep_photo.py` |
-| Portrait colors / grid | `scripts/make_ascii_svg.py` |
-| Heatmap colors / dimensions | `scripts/render_heatmap_svg.py` |
-| Animation speed | `scripts/make_ascii_svg.py`, `scripts/make_info_card.py`, `scripts/render_heatmap_svg.py` |
-| Heatmap data | `data/contributions.json` is generated automatically |
+| Name, role, current focus, experience, stack, highlights | `scripts/make_info_card.py` → `PROFILE` |
+| GitHub username | `scripts/make_info_card.py`, workflow `GITHUB_USERNAME`, and the prompts in this README |
+| Portrait source and preparation | Run `python scripts/prep_photo.py YOUR_PHOTO.jpg` |
+| ASCII colors, grid, or animation speed | `scripts/make_ascii_svg.py` |
+| Heatmap colors, dimensions, or animation speed | `scripts/render_heatmap_svg.py` |
+| Daily contribution data | Generated in `data/contributions.json` |
+| Image widths | The `width` attributes in this README |
 
 ### Local setup
 
@@ -93,9 +75,11 @@ py -3.11 -m venv .venv
 python -m pip install -r scripts\requirements.txt
 ```
 
-### Generate everything
+Pillow, NumPy, OpenCV, and rembg are only needed to create the portrait locally. The daily GitHub Actions workflow installs only requests and Beautiful Soup for the heatmap refresh.
 
-Place your portrait in the repository root, then run:
+### Build and preview
+
+Place a portrait at any local path, then run:
 
 ```bash
 python scripts/prep_photo.py source-photo.jpg
@@ -105,43 +89,19 @@ python scripts/fetch_contributions.py --username Anshuman118
 python scripts/render_heatmap_svg.py
 ```
 
-For a static info-card preview:
+The first command writes `source-prepped.png`, which the ASCII generator reads by default. Open the generated SVG files in a modern browser to preview them.
+
+### Publishing the profile repository
+
+A GitHub profile repository must have the exact same name as the GitHub username. GitHub displays this repository’s `README.md` at the top of that user’s profile.
 
 ```bash
-STATIC=1 python scripts/make_info_card.py
-```
-
-Windows PowerShell:
-
-```powershell
-$env:STATIC="1"
-python scripts/make_info_card.py
-Remove-Item Env:STATIC
-```
-
-### Preview locally
-
-The generated SVGs are standalone files. Open `avi-ascii.svg`, `info-card.svg`, and
-`contrib-heatmap.svg` directly in a modern browser, or serve the directory:
-
-```bash
-python -m http.server 8000
-```
-
-Then open `http://localhost:8000/`.
-
-### Create the GitHub profile repository
-
-A GitHub profile repository must have the exact same name as the GitHub username. With GitHub CLI:
-
-```bash
-gh repo create YAnshuman118 --public --clone
+gh repo create Anshuman118 --public --clone
 cd Anshuman118
 mkdir -p scripts data .github/workflows
 ```
 
-Copy this project into that repository, replace the placeholders, generate the SVGs/data,
-then commit:
+After copying this project into that repository and generating the assets:
 
 ```bash
 git add .
@@ -149,49 +109,11 @@ git commit -m "build animated profile README"
 git push
 ```
 
-GitHub renders the profile repository's `README.md` at the top of the matching user's profile.
+### Daily refresh
 
-### Daily contribution refresh
-
-`.github/workflows/update-profile-art.yml` runs daily at `06:17 UTC`, and also supports
-`workflow_dispatch`. It only regenerates:
+`.github/workflows/update-profile-art.yml` runs daily at 06:17 UTC and can also be started manually from the Actions tab. It regenerates only:
 
 - `data/contributions.json`
 - `contrib-heatmap.svg`
 
-The portrait and info card stay unchanged until you regenerate them manually.
-
-The workflow uses the repository's built-in Actions write permission to commit generated files;
-it does not require you to create or store a personal access token.
-
-### Design constraints
-
-- No JavaScript.
-- No external CSS.
-- No `<script>` tags.
-- No third-party GitHub statistics service.
-- No GitHub GraphQL API.
-- No personal access token.
-- Contribution data comes from GitHub's public contribution-calendar HTML.
-- Animation lives inside standalone SVG files.
-- Animations are one-shot and freeze at their final state.
-- The README uses `<img>` and a table for predictable GitHub rendering.
-
-### Important note
-
-GitHub can change its contribution-calendar HTML. The scraper deliberately has a fallback
-for common `data-date` markup changes and fails with a useful message rather than silently
-writing incorrect data. If GitHub changes the page structure substantially, update
-`scripts/fetch_contributions.py`.
-
-### Setup checklist
-
-- [ ] Create the profile repository with the exact username.
-- [ ] Replace every `Anshuman118`.
-- [ ] Replace `YOUR_NAME`, `YOUR_ROLE`, and the profile values in `make_info_card.py`.
-- [ ] Put your portrait at `source-photo.jpg` or pass another path to `prep_photo.py`.
-- [ ] Install the local dependencies.
-- [ ] Generate the portrait SVG, info card, contribution JSON, and heatmap.
-- [ ] Open the SVGs locally and verify them.
-- [ ] Push to GitHub.
-- [ ] Run the workflow manually once from the Actions tab.
+The portrait and information card stay unchanged until regenerated locally.
