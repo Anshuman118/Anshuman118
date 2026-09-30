@@ -9,14 +9,14 @@ from pathlib import Path
 from xml.sax.saxutils import escape
 
 PROFILE = {
-    "username": "YOUR_GITHUB_USERNAME",
+    "username": "Anshuman118",
     "name": "Anshuman Verma",
     "location": "India",
     "role": "B.Tech Student & Developer",
     "now": "Building projects & learning DSA",
     "prev": "Web Development & WordPress",
-    "stack": "Python  C++  JavaScript Git",
-    "highlights": "GitHub Projects  Web Development"
+    "stack": "Python  C++  JavaScript  Git",
+    "highlights": "GitHub Projects  Web Development",
     "status": "Available for collaboration",
 }
 
@@ -34,7 +34,6 @@ def env_or_profile(key: str, value: str) -> str:
 
 def get_profile() -> dict[str, str]:
     p = {k: env_or_profile(k, v) for k, v in PROFILE.items()}
-    # Environment variables use descriptive names.
     mapping = {
         "current_focus": "now",
         "previous_experience": "prev",
