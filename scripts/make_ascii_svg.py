@@ -25,7 +25,7 @@ def pixels_to_ascii(path: Path, cols: int, rows: int) -> list[str]:
     image = Image.open(path).convert("L")
 
     # Terminal glyphs are taller than they are wide, so compensate vertically.
-    target_ratio = cols / (rows * 0.50)
+    target_ratio = cols / (rows / 0.50)
     w, h = image.size
     current_ratio = w / h
     if current_ratio > target_ratio:
