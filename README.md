@@ -11,7 +11,7 @@
 <table>
   <tr>
     <td valign="top">
-      <img src="./avi-ascii.svg" width="370" alt="Animated ASCII portrait" />
+      <img src="./avi-ascii.svg?version=2" width="370" alt="Animated ASCII portrait" />
     </td>
     <td valign="top">
       <img src="./info-card.svg" width="490" alt="Animated neofetch profile card" />
