@@ -1,42 +1,7 @@
 {
   "username": "Anshuman118",
-  "generated_at": "2026-11-21T14:44:55.082433+00:00",
+  "generated_at": "2026-11-22T14:40:55.852477+00:00",
   "days": [
-    {
-      "date": "2025-11-16",
-      "count": 0,
-      "level": 0
-    },
-    {
-      "date": "2025-11-17",
-      "count": 0,
-      "level": 0
-    },
-    {
-      "date": "2025-11-18",
-      "count": 0,
-      "level": 0
-    },
-    {
-      "date": "2025-11-19",
-      "count": 0,
-      "level": 0
-    },
-    {
-      "date": "2025-11-20",
-      "count": 0,
-      "level": 0
-    },
-    {
-      "date": "2025-11-21",
-      "count": 0,
-      "level": 0
-    },
-    {
-      "date": "2025-11-22",
-      "count": 0,
-      "level": 0
-    },
     {
       "date": "2025-11-23",
       "count": 0,
@@ -1856,13 +1821,18 @@
       "date": "2026-11-21",
       "count": 0,
       "level": 0
+    },
+    {
+      "date": "2026-11-22",
+      "count": 0,
+      "level": 0
     }
   ],
   "total_contributions": 0,
   "current_streak": 0,
   "longest_streak": 0,
   "best_day": {
-    "date": "2026-11-21",
+    "date": "2026-11-22",
     "count": 0,
     "level": 0
   },
